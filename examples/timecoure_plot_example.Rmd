@@ -1,0 +1,56 @@
+Example time course plot for qPCR data
+
+```{r plots rdrs2s_and_6s pdf, echo=F, warning=F}
+# unique(qPCRdata.summary$Genotype)[-(2:3)]
+
+plot_colours = plot.colours <- c("#4E8E9B",
+                                 # "#8D66D3",
+                                 # "#6CAA37")
+                                 "#C74C32",
+                                 "#5D5626",
+                                 "#6A4873",
+                                 "#58A36F",
+                                 "#C48F3B")
+# "#C0546E",
+# "#D150B7",
+# "#8A8FCA")
+
+genotypes = genotypes = factor(c("Col-0", "rdr6", "rdr2-2", "rdr1 rdr6", "rdr2 rdr6", "rdr2-1"))
+
+pdf("qPCR36_plots_col_rdrs2s_and_6s.pdf",
+    height=3,
+    width=4)
+for(i in unique(qPCRdata.summary$Target)){
+  # i="APX2"
+  geno=genotypes
+  
+  plot.data <- qPCRdata.summary[qPCRdata.summary$Target==i 
+                                & qPCRdata.summary$Genotype %in% geno
+                                , ]
+  print(
+    ggplot(data=plot.data, aes(x=Timepoint, y=FC, color=Genotype, fill=Genotype,
+                               #                            , group = factor(Genotype)
+    )) +
+      geom_point() +
+      geom_errorbar(aes(ymin=FC-se, 
+                        ymax=FC+se), 
+                    width=30, 
+                    position=position_dodge(width = 0.90)) +
+      geom_smooth(aes(stat="identity"),
+                  #               method = "lm", formula = y ~ poly(x, 4)
+                  #               method =family = binomial, formula = y ~ poly(x,2)
+      ) +
+      #   geom_line() +
+      #   scale_x_discrete(breaks=c(0,30,60,75,90,120,125), labels=c(0,30,60,75,90,120, 125)) +
+      ylab(paste0(i," Relative abundance")) +
+      geom_vline(xintercept = 65, linetype = "dotted") + 
+      theme_bw() +
+      scale_fill_manual(values = plot_colours) +
+      scale_colour_manual(values = plot_colours) +
+      theme(text = element_text(size=10))
+  )
+}
+
+dev.off()
+
+```
