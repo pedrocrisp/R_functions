@@ -13,6 +13,25 @@
 #### summarise ####
 qPCR_analysis_2 <- function(qPCR_data, ref_amplicon, ref_sample, ref_group, ref_timepoint, Groups_to_plot, qPCR_exp, data_analysis, OutPutFolder){
   
+ print("qPCR_data")
+ print(qPCR_data)
+ print("ref_amplicon")
+ print(ref_amplicon)
+ print("ref_sample")
+ print(ref_sample)
+ print("ref_group")
+ print(ref_group)
+ print("ref_timepoint")
+ print(ref_timepoint)
+ print("Groups_to_plot")
+ print(Groups_to_plot)
+ print("qPCR_exp")
+ print(qPCR_exp)
+ print("data_analysis")
+ print(data_analysis)
+ print("OutPutFolder")
+ print(OutPutFolder)
+  
   #debugging
   # qPCR_data <- DataRaw
   # ref_amplicon <- "PP2A"
@@ -119,6 +138,42 @@ qPCR_analysis_2 <- function(qPCR_data, ref_amplicon, ref_sample, ref_group, ref_
   # "#C0546E",
   # "#D150B7",
   # "#8A8FCA")
+  
+  pdf(paste0(OutPutFolder, "/", qPCR_exp, "_", data_analysis, "_log2.pdf"),
+      height=3,
+      width=4)
+  for(i in unique(GroupData$Amplicon)){
+    # i="Col"
+    geno=factor(Groups_to_plot)
+    
+    plot.data <- GroupData[GroupData$Amplicon==i 
+                           & GroupData$Group %in% geno
+                           , ]
+    print(
+      ggplot(data=plot.data, aes(x=Timepoint, y=log2(norm_abundance2), color=Group, fill=Group,
+                                 #                            , group = factor(Genotype)
+      )) +
+        geom_point() +
+        geom_errorbar(aes(ymin=log2(norm_abundance2-se2), 
+                          ymax=log2(norm_abundance2+se2)), 
+                      width=30, 
+                      position=position_dodge(width = 0.90)) +
+        geom_smooth(aes(stat="identity"),
+                    #               method = "lm", formula = y ~ poly(x, 4)
+                    #               method =family = binomial, formula = y ~ poly(x,2)
+        ) +
+        #   geom_line() +
+        #   scale_x_discrete(breaks=c(0,30,60,75,90,120,125), labels=c(0,30,60,75,90,120, 125)) +
+        ylab(paste0(i," Relative abundance")) +
+        geom_vline(xintercept = 65, linetype = "dotted") + 
+        theme_bw() +
+        scale_fill_manual(values = plot_colours) +
+        scale_colour_manual(values = plot_colours) +
+        theme(text = element_text(size=10))
+    )
+  }
+  
+  dev.off()
   
   pdf(paste0(OutPutFolder, "/", qPCR_exp, "_", data_analysis, ".pdf"),
       height=3,

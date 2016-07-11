@@ -13,6 +13,21 @@
 #### summarise ####
 qPCR_analysis <- function(qPCR_data, ref_amplicon, ref_sample, ref_group, qPCR_exp, data_analysis, OutPutFolder){
   
+  print("qPCR_data")
+  print(qPCR_data)
+  print("ref_amplicon")
+  print(ref_amplicon)
+  print("ref_sample")
+  print(ref_sample)
+  print("ref_group")
+  print(ref_group)
+  print("qPCR_exp")
+  print(qPCR_exp)
+  print("data_analysis")
+  print(data_analysis)
+  print("OutPutFolder")
+  print(OutPutFolder)
+  
   #qPCR_data <- read.csv("qPCR#64 xrn4 light stress run 1.csv", skip=3)
   #ref_amplicon <- "PP2AA3_3'"
   #ref_sample <- "1"
