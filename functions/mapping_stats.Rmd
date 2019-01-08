@@ -1,0 +1,93 @@
+---
+title: "mapping"
+author: "Peter Crisp"
+date: "09/06/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(gplots)
+library(ggplot2)
+library("gganimate")
+
+mapping_data <- read_csv("MAIZE_UMN1_sRNA_Counts.csv")
+mapping_data
+
+#kind of useless plot
+ggplot(mapping_data, aes(x=code, y=sRNA_Counts, fill=hits)) +
+  geom_bar(stat = "identity")
+
+# use facet grip to display each bar plot seperately
+ggplot(mapping_data, aes(x=hits, y=sRNA_Counts)) +
+  geom_bar(stat = "identity") +
+  facet_grid(code ~ ., scales="free")
+
+# create new data frame to manipulate and corrupt...
+mapping_data2 <- mapping_data
+
+#mutate data to convert to percentage
+#make #hits a factor in desired order
+mapping_data3 <- mapping_data2 %>% 
+  spread(key = hits, value = sRNA_Counts) %>%
+  mutate(sum_2_10=rowSums(.[5:13]), sum_11_50=rowSums(.[14:nrow(.)])) %>%
+  select(-c(5:53)) %>%
+  gather(key = hits, value = counts, -code) %>%
+  group_by(code) %>%
+  mutate(percentage=counts/sum(counts)*100) %>%
+  mutate(hits = replace(hits, which(hits==-1), c(">50"))) %>%
+  mutate(hits = replace(hits, which(hits==0), c("unmapped"))) %>%
+  mutate(hits=factor(hits, levels=
+                       rev(c("1",
+                         "sum_2_10",
+                         "sum_11_50",
+                         ">50",
+                         "unmapped"))))
+
+# pick colour scale
+# use reds + grey for umapped
+display.brewer.all()
+colors <- rev(c(brewer.pal(9,"OrRd")[4:7], "grey"))
+
+# plot
+g <- ggplot(mapping_data3, aes(x=code, y=percentage, fill=hits)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values =colors) +
+  coord_flip() +
+  theme_minimal() +
+  labs(title="Multimapping rates", 
+         subtitle="Distribution of multimapping sRNAs per library",
+         caption="Source: Reza",
+         x="Library",
+         fill="Mapping rate")
+
+g
+
+pdf("")
+# experiment with annimation #####
+
+# Plot
+g <- ggplot(mapping_data2, aes(x = hits, frame = code)) + 
+  geom_density(aes(), alpha=0.8) + 
+    labs(title="Multimapping rates", 
+         subtitle="Distribution of multimapping sRNAs per library",
+         caption="Source: mpg",
+         x="multimapping",
+         fill="Sample")
+
+gganimate(g)
+
+g <- ggplot(mapping_data, aes(x=hits, y=sRNA_Counts, frame = code)) +
+  geom_bar(stat = "identity") +
+  facet_grid(code ~ ., scales="free")
+
+gganimate(g)
+
+dev.off()
+
+
+
+```
+
