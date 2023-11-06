@@ -1,4 +1,3 @@
-############ ############ ############ ############ ############ ############ ############ ############ ############ ############ ############ ############ 
 # Function # 2 get list of distinct DMRs per context
 common_distinct_tile_list <- function(context, prefix, data_path, sample_list, clustering_group, min_samples_with_DMR){
   
